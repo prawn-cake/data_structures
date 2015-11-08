@@ -151,8 +151,5 @@ class MinHeap(BinaryHeap):
                 return False
         return True
 
-    def __unicode__(self):
-        return u'{}({})'.format(self.__class__.__name__, self.storage)
-
     def __repr__(self):
-        return u'{}({})'.format(self.__class__.__name__, self.storage)
+        return '{}({})'.format(self.__class__.__name__, self.storage)

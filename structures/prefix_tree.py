@@ -2,9 +2,65 @@
 """Prefix tree / Digital tree / Radix tree / Trie implementation
 See definition: https://en.wikipedia.org/wiki/Trie
 """
+import random
+import collections
+
+SEPARATOR = '\n'
 
 
-class TrieNode(object):
+class PrefixTree(collections.MutableMapping):
+    """Prefix tree. In fact this is just a trie node holder"""
+
+    def __init__(self, tolerance=0):
+        self.tree = TrieNode()
+        self.tolerance = tolerance
+
+    def __contains__(self, item):
+        return self.tree.find(value=item, tolerance=self.tolerance)
+
+    def __setitem__(self, _, value):
+        """Set tree value
+
+        :param _:
+        :param value:
+        """
+        self.tree.insert(value=value)
+
+    def __getitem__(self, item):
+        nodes = self.tree.find(
+            value=item, tolerance=self.tolerance, lookup_list=[])
+        result_list = []
+
+        if len(nodes):
+            word = None
+            stack = []
+            for node in nodes:
+                char = node.tag
+                if char != SEPARATOR:
+                    stack.append(char)
+                else:
+                    if word is None:
+                        word = ''.join(stack)
+                        result_list.append(word)
+                        stack = []
+                    else:
+                        result_list.append(''.join([word, ''.join(stack)]))
+
+        return result_list
+
+    def __delitem__(self, key):
+        return self.tree.delete(key)
+
+    def __iter__(self):
+        return iter(self.tree)
+
+    def __len__(self):
+        pass
+
+
+class TrieNode(collections.Iterable):
+    """Main tree node class"""
+
     def __init__(self, tag=''):
         self.tag = tag
         self.words = 0
@@ -24,12 +80,57 @@ class TrieNode(object):
             node.insert(value[1:])
 
     def delete(self, value):
-        pass
+        """Delete operation
 
-    def find(self, value):
+        :rtype : object
+        """
+        if not value:
+            if self.is_end and not self.words:
+                return True
+            else:
+                self.words -= 1
+                return False
+
+        tag = value[0]
+        if tag in self.nodes:
+            node = self.nodes[tag]
+            can_delete = node.delete(value=value[1:])
+            if can_delete:
+                del self.nodes[tag]
+                self.prefixes -= 1
+
+    def get_random_node(self):
+        random_key = random.choice(list(self.nodes.keys()))
+        return self.nodes[random_key]
+
+    def find(self, value, tolerance=0, lookup_list=None):
+        """Find method.
+        Some tricks are here:
+          - basic search just return true or false
+          - 'tolerant' search enable to do non-exact search
+
+        :param value: str: string value
+        :param tolerance: int: degree of tolerance
+        :param lookup_list: list: enable to do words lookup
+        :return:
+        """
+        # FIXME: perhaps tolerance is wrong feature for this data structure
         if not value:
             if self.is_end:
-                return True
+                # Separate words with line-break
+                if lookup_list:
+                    lookup_list.append(TrieNode(tag=SEPARATOR))
+
+                # if it's the end of word but tolerance > 0, continue search
+                if tolerance > 0 and self.nodes:
+                    tolerance -= 1
+                    node = self.get_random_node()
+                    if lookup_list:
+                        lookup_list.append(node)
+                    node.find(value='',
+                              tolerance=tolerance,
+                              lookup_list=lookup_list)
+                return lookup_list or True
 
             # Probably typo in the word
             return False
@@ -37,30 +138,38 @@ class TrieNode(object):
         tag = value[0]
         if tag in self.nodes:
             node = self.nodes[tag]
-            return node.find(value[1:])
 
+            if lookup_list is not None:
+                lookup_list.append(node)
+
+            return node.find(value=value[1:],
+                             tolerance=tolerance,
+                             lookup_list=lookup_list)
+        else:
+            if tolerance > 0:
+                tolerance -= 1
+
+                # We are tolerant and do continue searching in some random node
+                node = self.get_random_node()
+
+                if lookup_list is not None:
+                    lookup_list.append(node)
+                return node.find(value=value[1:],
+                                 tolerance=tolerance,
+                                 lookup_list=lookup_list)
         return False
 
-    def find_similar(self, key, tolerance=1):
-        node = self
-        for tag in key:
-            if tag not in self.nodes:
-                return None
-            else:
-                node = self.nodes[tag]
-        return node.tag
-
-    def total_words(self, key=None):
+    def total_words(self, prefix=None):
         """Get total words in general and particularly
 
-        :param key: if key is set filter sum by branch
+        :param prefix: if prefix is set filter sum by branch
         :return: int
         """
-        if key:
-            tag = key[0]
+        if prefix:
+            tag = prefix[0]
             if tag in self.nodes:
                 node = self.nodes[tag]
-                return self.words + node.words(key=key[1:])
+                return self.words + node.words(key=prefix[1:])
             else:
                 return 0
         else:
@@ -87,19 +196,9 @@ class TrieNode(object):
         """
         return bool(self.words)
 
-    def __contains__(self, item):
-        pass
-
-    def __setitem__(self, key, value):
-        pass
-
-    def __getitem__(self, item):
-        pass
-
     def __repr__(self):
-        return "%s(tag='%s', words=%d)" % (
-            self.__class__.__name__, self.tag, self.words)
+        return "%s(tag='%s', words=%d, prefixes=%d)" % (
+            self.__class__.__name__, self.tag, self.words, self.prefixes)
 
-
-if __name__ == '__main__':
-    pass
+    def __iter__(self):
+        return iter(self.nodes)
