@@ -19,7 +19,11 @@ my implementation is a good start to customize it for your needs.
 
 * Binary search tree
 * Binary heap
-* Undirected graph + find path function
+* Graph (directed/undirected)
+    * basic find path function
+    * dijkstra search
+    * bfs
+ 
 * [BK-Tree](https://en.wikipedia.org/wiki/BK-tree)
 * [Prefix tree] (https://en.wikipedia.org/wiki/Trie)
 
