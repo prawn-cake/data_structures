@@ -99,8 +99,9 @@ class Node(object):
             will be equal 0
 
         """
-        if order is None and queue is None:
+        if order is None:
             order = []
+        if queue is None:
             queue = deque()
 
         order.append(node.value)
@@ -119,8 +120,8 @@ class Node(object):
     def get_tree(cls, values):
         """Build tree from list of values
 
-        :param values:
-        :return:
+        :param values: list
+        :return: Node: tree
         """
         root = Node.insert(None, values[0])
         for value in values[1:]:
@@ -199,42 +200,3 @@ class Node(object):
             self.__class__.__name__,
             self.value,
             self.count)
-
-
-if __name__ == '__main__':
-    # root = Node.insert(None, 4)
-    # Node.insert(root, 1)
-    # Node.insert(root, 2)
-    # Node.insert(root, 7)
-    # Node.insert(root, 5)
-    # Node.insert(root, 4)  # already contained
-    # Node.insert(root, 6)
-    # Node.insert(root, 3)
-    #
-    # assert Node.in_order_traversal(root) == [1, 2, 3, 4, 5, 6, 7]
-    #
-    # def checks(root):
-    #     assert root.max_val == 7
-    #     assert root.min_val == 1
-    #     assert root.count == 7
-    #     assert isinstance(root.search(5), Node)
-    #     assert root.search(8) is None
-    #     # check rank
-    #     assert Node.rank(7, root) == 6  # 6 nodes less than 7
-    #     assert Node.rank(1, root) == 0
-    #     assert Node.level_order_traversal(root) == [4, 1, 7, 2, 5, 3, 6]
-    #
-    # checks(root)
-    #
-    # tree = Node.get_tree(Node.pre_order_traversal(root))
-    # checks(tree)
-    #
-    # Node.insert(tree, 8)
-    # Node.insert(tree, 9)
-    # Node.delete(7, tree)
-    # print(Node.level_order_traversal(tree))
-    values = [5, 3, 7, 9]
-    tree = Node.get_tree(values)
-    print(Node.level_order_traversal(tree))
-    print(tree.count)
-    print(1 + Node.height(tree))

@@ -22,13 +22,14 @@ def levenshtein_distance(s, t):
     if n < m:
         return levenshtein_distance(t, s)
 
-    current_row = range(n+1)
+    current_row = range(n + 1)
 
-    for i in range(1, m+1):  # row iterator
+    for i in range(1, m + 1):  # row iterator
         previous_row, current_row = current_row, [i]+[0]*n
-        for j in range(1, n+1):  # column iterator
+        for j in range(1, n + 1):  # column iterator
             add, delete = previous_row[j] + 1, current_row[j-1] + 1
-            change = previous_row[j-1] + (s[j-1] != t[i-1])
+            subst_cost = (s[j - 1] != t[i - 1])
+            change = previous_row[j-1] + subst_cost
             current_row[j] = min(add, delete, change)
 
     return current_row[n]
@@ -142,7 +143,3 @@ class BKNode(object):
             self.word,
             self.distance,
             self.count)
-
-
-if __name__ == '__main__':
-    pass

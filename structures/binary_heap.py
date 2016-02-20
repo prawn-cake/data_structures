@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import abc
-import unittest
 
 
 class BinaryHeap(object):
@@ -141,7 +140,6 @@ class MinHeap(BinaryHeap):
 
     def validate(self):
         """Helper method to validate correctness of heap structure
-
 
         :return: bool
         """
