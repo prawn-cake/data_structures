@@ -202,14 +202,6 @@ class TrieNode(collections.Iterable):
             if node.value:
                 yield node.value
 
-    @property
-    def is_end(self):
-        """Indicate that current node is the end of the word
-
-        :rtype : bool
-        """
-        return bool(self.nodes)
-
     def __repr__(self):
         return "%s(tag='%s', words=%d, tags_num=%d)" % (
             self.__class__.__name__, self.tag, self.words, self.tags_num)
