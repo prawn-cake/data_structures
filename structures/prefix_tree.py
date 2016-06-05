@@ -15,7 +15,7 @@ class PrefixTree(collections.MutableMapping):
         self.tree = TrieNode()
 
     def __contains__(self, value):
-        return self.tree.lookup(value=value)
+        return bool(list(self.tree.lookup(value=value, fuzzy=False)))
 
     def __setitem__(self, _, value):
         """Set tree value
@@ -29,7 +29,7 @@ class PrefixTree(collections.MutableMapping):
         return self.tree.lookup(value=value)
 
     def __delitem__(self, key):
-        return self.tree.remove(key)
+        return self.tree.remove(value=key)
 
     def __iter__(self):
         return iter(self.tree)

@@ -68,15 +68,21 @@ class TrieNodeTest(unittest.TestCase):
 
 
 class PrefixTreeTest(unittest.TestCase):
-    def test_lookup(self):
+    def test_tree(self):
         prefix_tree = PrefixTree()
         values = ['amy', 'ann', 'anne', 'emma', 'rob', 'roger', 'anna']
+
+        # Test setter
         for value in values:
             prefix_tree[value] = value
 
-        self.assertIn('amy', prefix_tree)
+        # Test getter
         result = prefix_tree['ann']
         self.assertTrue(result)
         self.assertTrue(inspect.isgenerator(result))
         # expect 'ann', 'anne' and 'anna'
         self.assertEqual(len(list(result)), 3)
+
+        # Test containment
+        self.assertTrue('amy' in prefix_tree)
+        self.assertFalse('am' in prefix_tree)
