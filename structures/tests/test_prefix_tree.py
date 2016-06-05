@@ -38,6 +38,9 @@ class TrieNodeTest(unittest.TestCase):
         for val in ['am', 'an', 'johm', 'max']:
             self.assertFalse(list(trie.lookup(val, fuzzy=False)))
 
+        # Test empty search
+        self.assertEqual(list(trie.lookup('non-existed')), [])
+
     def test_delete(self):
         trie = TrieNode()
         values = ['amy', 'ann', 'anne', 'emma', 'rob', 'roger', 'anna']

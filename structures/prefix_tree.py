@@ -139,14 +139,12 @@ class TrieNode(collections.Iterable):
             idx += 1
 
         # Handle if this is a final value and check if anything further
-        values = []
         if fuzzy:
             for val in node.get_values():
                 yield val
         else:
             if node.value:
-                values.append(node.value)
-        return values
+                yield node.value
 
     def total_words(self, prefix=None):
         """Get total words in general and particularly
@@ -196,8 +194,6 @@ class TrieNode(collections.Iterable):
 
             if node.nodes:
                 nodes.extend(node.nodes.values())
-
-        return values
 
     def get_values(self):
         """Handy helper around traverse to get tree values
