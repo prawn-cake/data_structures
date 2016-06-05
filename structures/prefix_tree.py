@@ -2,10 +2,7 @@
 """Prefix tree / Digital tree / Radix tree / Trie implementation
 See definition: https://en.wikipedia.org/wiki/Trie
 """
-import random
 import collections
-
-SEPARATOR = '\n'
 
 
 class PrefixTree(collections.MutableMapping):
