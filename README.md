@@ -1,5 +1,7 @@
 Data structures
 ================
+[![Build Status](https://travis-ci.org/prawn-cake/data_structures.svg?branch=master)](https://travis-ci.org/prawn-cake/data_structures)
+[![Coverage Status](https://coveralls.io/repos/github/prawn-cake/data_structures/badge.svg?branch=master)](https://coveralls.io/github/prawn-cake/data_structures?branch=master)
 ![PythonVersions](https://www.dropbox.com/s/ck0nc28ttga2pw9/python-2.7_3.4-blue.svg?dl=1)
 
 This is a pet project implementing different common and specific data structures in pure python.

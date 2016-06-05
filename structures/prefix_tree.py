@@ -186,7 +186,6 @@ class TrieNode(collections.Iterable):
     def traverse_tree(self):
         """Traverse nodes and get end values with depth search
         """
-        values = []
         nodes = [self]
         while nodes:
             node = nodes.pop()
