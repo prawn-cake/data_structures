@@ -23,7 +23,6 @@ my implementation is a good start to customize it for your needs.
     * basic find path function
     * dijkstra search
     * bfs
- 
 * [BK-Tree](https://en.wikipedia.org/wiki/BK-tree)
 * [Prefix tree] (https://en.wikipedia.org/wiki/Trie)
 

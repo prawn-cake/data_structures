@@ -11,12 +11,11 @@ SEPARATOR = '\n'
 class PrefixTree(collections.MutableMapping):
     """Prefix tree. In fact this is just a trie node holder"""
 
-    def __init__(self, tolerance=0):
+    def __init__(self):
         self.tree = TrieNode()
-        self.tolerance = tolerance
 
-    def __contains__(self, item):
-        return self.tree.find(value=item, tolerance=self.tolerance)
+    def __contains__(self, value):
+        return self.tree.lookup(value=value)
 
     def __setitem__(self, _, value):
         """Set tree value
@@ -26,138 +25,128 @@ class PrefixTree(collections.MutableMapping):
         """
         self.tree.insert(value=value)
 
-    def __getitem__(self, item):
-        nodes = self.tree.find(
-            value=item, tolerance=self.tolerance, lookup_list=[])
-        result_list = []
-
-        if len(nodes):
-            word = None
-            stack = []
-            for node in nodes:
-                char = node.tag
-                if char != SEPARATOR:
-                    stack.append(char)
-                else:
-                    if word is None:
-                        word = ''.join(stack)
-                        result_list.append(word)
-                        stack = []
-                    else:
-                        result_list.append(''.join([word, ''.join(stack)]))
-
-        return result_list
+    def __getitem__(self, value):
+        return self.tree.lookup(value=value)
 
     def __delitem__(self, key):
-        return self.tree.delete(key)
+        return self.tree.remove(key)
 
     def __iter__(self):
         return iter(self.tree)
 
     def __len__(self):
-        pass
+        return self.tree.total_tags()
 
 
 class TrieNode(collections.Iterable):
     """Main tree node class"""
 
-    def __init__(self, tag=''):
+    def __init__(self, tag='', parent=None):
         self.tag = tag
+        self.value = None
         self.words = 0
-        self.prefixes = 0
+        self.tags_num = 0
         self.nodes = {}
+        self.parent = parent
+
+    def _get_or_create_node(self, value, create=True):
+        """Get or create trie node.
+        Reusable in the lookup, insert and delete methods
+
+        :param value: str
+        :return: TrieNode
+        """
+        node = self
+        idx = 1
+        while idx <= len(value):
+            tag = value[:idx]
+            # Create new node with tag if doesn't exist
+            if tag not in node.nodes:
+                if create:
+                    node.nodes[tag] = TrieNode(tag=tag, parent=node)
+                    node.tags_num += 1
+                else:
+                    # Return None if node is not found
+                    return None
+            node = node.nodes[tag]
+
+            # Increment index and continue traversing
+            idx += 1
+        return node
 
     def insert(self, value):
-        if not value:
-            # end of insert, last character of word
-            self.words += 1
-        else:
-            tag = value[0]
-            if tag not in self.nodes:
-                self.nodes[tag] = TrieNode(tag=tag)
-                self.prefixes += 1
-            node = self.nodes[tag]
-            node.insert(value[1:])
+        """Inserting value to a tree
 
-    def delete(self, value):
-        """Delete operation
-
-        :rtype : object
+        :param value: str: value to insert
         """
-        if not value:
-            if self.is_end and not self.words:
-                return True
-            else:
-                self.words -= 1
-                return False
+        if not isinstance(value, str):
+            raise ValueError("Wrong value to insert '%r', must be str" % value)
 
-        tag = value[0]
-        if tag in self.nodes:
-            node = self.nodes[tag]
-            can_delete = node.delete(value=value[1:])
-            if can_delete:
-                del self.nodes[tag]
-                self.prefixes -= 1
+        # Get or create node
+        node = self._get_or_create_node(value=value)
+        if node.value is None:
+            node.value = value
+            node.parent.words += 1
 
-    def get_random_node(self):
-        random_key = random.choice(list(self.nodes.keys()))
-        return self.nodes[random_key]
+    def remove(self, value):
+        """Remove value from the tree
+        Find the node and remove the value or the node itself if no children
 
-    def find(self, value, tolerance=0, lookup_list=None):
-        """Find method.
-        Some tricks are here:
-          - basic search just return true or false
-          - 'tolerant' search enable to do non-exact search
+        :param value: str:
+        :rtype : int: -1, 0 or 1, where
+         -1 - nothing to delete
+         0  - whole node has been removed
+         1  - only node value has been removed
+        """
 
+        node = self._get_or_create_node(value=value, create=False)
+        if node is None or node.value is None:
+            # Nothing to delete, no such value in the tree
+            return -1
+
+        # If there are children, just reset the value
+        parent = node.parent
+        parent.words -= 1
+        if node.nodes:
+            node.value = None
+            return 1
+        else:
+            # Remove link from parent and remove the node object itself
+            parent.tags_num -= 1
+            del parent.nodes[node.tag]
+            del node
+            return 0
+
+    def lookup(self, value, fuzzy=True):
+        """Values lookup method.
+
+        :param fuzzy: bool: continue search and return values from child nodes
         :param value: str: string value
-        :param tolerance: int: degree of tolerance
-        :param lookup_list: list: enable to do words lookup
         :return:
         """
-        # FIXME: perhaps tolerance is wrong feature for this data structure
-        if not value:
-            if self.is_end:
-                # Separate words with line-break
-                if lookup_list:
-                    lookup_list.append(TrieNode(tag=SEPARATOR))
 
-                # if it's the end of word but tolerance > 0, continue search
-                if tolerance > 0 and self.nodes:
-                    tolerance -= 1
-                    node = self.get_random_node()
-                    if lookup_list:
-                        lookup_list.append(node)
-                    node.find(value='',
-                              tolerance=tolerance,
-                              lookup_list=lookup_list)
-                return lookup_list or True
+        node = self
+        idx = 1
+        while idx <= len(value):
+            tag = value[:idx]
+            # Create new node with tag if doesn't exist
+            if tag not in node.nodes:
+                node.nodes[tag] = TrieNode(tag=tag)
+                node.tags_num += 1
+            node = node.nodes[tag]
 
-            # Probably typo in the word
-            return False
+            # Increment index and continue searching
+            idx += 1
 
-        tag = value[0]
-        if tag in self.nodes:
-            node = self.nodes[tag]
-
-            if lookup_list is not None:
-                lookup_list.append(node)
-
-            return node.find(value=value[1:],
-                             tolerance=tolerance,
-                             lookup_list=lookup_list)
+        # Handle if this is a final value and check if anything further
+        values = []
+        if fuzzy:
+            for val in node.get_values():
+                yield val
         else:
-            if tolerance > 0:
-                tolerance -= 1
-
-                # We are tolerant and do continue searching in some random node
-                node = self.get_random_node()
-
-                if lookup_list is not None:
-                    lookup_list.append(node)
-                return node.find(value=value[1:],
-                                 tolerance=tolerance,
-                                 lookup_list=lookup_list)
-        return False
+            if node.value:
+                values.append(node.value)
+        return values
 
     def total_words(self, prefix=None):
         """Get total words in general and particularly
@@ -165,28 +154,58 @@ class TrieNode(collections.Iterable):
         :param prefix: if prefix is set filter sum by branch
         :return: int
         """
-        if prefix:
-            tag = prefix[0]
-            if tag in self.nodes:
-                node = self.nodes[tag]
-                return self.words + node.words(key=prefix[1:])
-            else:
-                return 0
-        else:
-            return self.words + sum([
-                node.total_words() for node in self.nodes.values()])
 
-    def total_prefixes(self, key=None):
-        if key:
-            tag = key[0]
-            if tag in self.nodes:
-                node = self.nodes[tag]
-                return self.prefixes + node.total_prefixes(key=key[1:])
-            else:
-                return 0
+        if prefix:
+            node = self._get_or_create_node(create=False, value=prefix)
         else:
-            return self.prefixes + sum([
-                node.total_prefixes() for node in self.nodes.values()])
+            node = self
+        cnt = node.words
+
+        # Traverse tree and gather all counters
+        for node in self.traverse_tree():
+            cnt += node.words
+
+        return cnt
+
+    def total_tags(self, tag=None):
+        """Get total tags
+
+        :param tag:
+        :return:
+        """
+        if tag:
+            node = self._get_or_create_node(create=False, value=tag)
+        else:
+            node = self
+        cnt = node.words
+
+        # Traverse tree and gather all counters
+        for node in self.traverse_tree():
+            cnt += node.tags_num
+
+        return cnt
+
+    def traverse_tree(self):
+        """Traverse nodes and get end values with depth search
+        """
+        values = []
+        nodes = [self]
+        while nodes:
+            node = nodes.pop()
+            yield node
+
+            if node.nodes:
+                nodes.extend(node.nodes.values())
+
+        return values
+
+    def get_values(self):
+        """Handy helper around traverse to get tree values
+        :rtype : str: node value
+        """
+        for node in self.traverse_tree():
+            if node.value:
+                yield node.value
 
     @property
     def is_end(self):
@@ -194,11 +213,11 @@ class TrieNode(collections.Iterable):
 
         :rtype : bool
         """
-        return bool(self.words)
+        return bool(self.nodes)
 
     def __repr__(self):
-        return "%s(tag='%s', words=%d, prefixes=%d)" % (
-            self.__class__.__name__, self.tag, self.words, self.prefixes)
+        return "%s(tag='%s', words=%d, tags_num=%d)" % (
+            self.__class__.__name__, self.tag, self.words, self.tags_num)
 
     def __iter__(self):
         return iter(self.nodes)
