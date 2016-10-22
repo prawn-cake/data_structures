@@ -4,6 +4,7 @@ from structures.binary_search_tree import Node
 
 
 class BinarySearchTreeTest(unittest.TestCase):
+
     def do_basic_checks(self, root):
         self.assertEqual(root.max_val, 7)
         self.assertEqual(root.min_val, 1)
@@ -42,6 +43,6 @@ class BinarySearchTreeTest(unittest.TestCase):
                          [4, 1, 8, 2, 5, 9, 3, 6])
         values = [5, 3, 7, 9]
         tree = Node.get_tree(values)
-        self.assertEqual(Node.level_order_traversal(tree),  [5, 3, 7, 9])
+        self.assertEqual(Node.level_order_traversal(tree), [5, 3, 7, 9])
         self.assertEqual(tree.count, 4)
         self.assertEqual(Node.height(tree), 3)

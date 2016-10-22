@@ -30,6 +30,7 @@ def find_path(graph, start, end, path=None):
 
 
 class Vertex(object):
+
     def __init__(self, value, weight=None):
         self.value = value
         self.weight = weight

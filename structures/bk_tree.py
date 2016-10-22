@@ -25,11 +25,11 @@ def levenshtein_distance(s, t):
     current_row = range(n + 1)
 
     for i in range(1, m + 1):  # row iterator
-        previous_row, current_row = current_row, [i]+[0]*n
+        previous_row, current_row = current_row, [i] + [0] * n
         for j in range(1, n + 1):  # column iterator
-            add, delete = previous_row[j] + 1, current_row[j-1] + 1
+            add, delete = previous_row[j] + 1, current_row[j - 1] + 1
             subst_cost = (s[j - 1] != t[i - 1])
-            change = previous_row[j-1] + subst_cost
+            change = previous_row[j - 1] + subst_cost
             current_row[j] = min(add, delete, change)
 
     return current_row[n]
@@ -62,7 +62,7 @@ class BKTree(object):
 
         # FIXME
         node.count = 1 + cls.size_of(node) \
-                     + sum([cls.size_of(n) for n in node.nodes.values()])
+            + sum([cls.size_of(n) for n in node.nodes.values()])
         return node
 
     def search(self, word, distance=0, result_set=None):

@@ -27,7 +27,7 @@ class Node(object):
             node.left = Node.insert(node.left, value)
 
         node.count = 1 + cls.size_of(node.left) + \
-                     cls.size_of(node.right)
+            cls.size_of(node.right)
         return node
 
     def search(self, value):
@@ -154,7 +154,7 @@ class Node(object):
             return Node.rank(value, node.left)
         elif node.value < value:
             return 1 + cls.size_of(node.left) +\
-                   Node.rank(value, node.right)
+                Node.rank(value, node.right)
         elif node.value == value:
             return cls.size_of(node.left)
 

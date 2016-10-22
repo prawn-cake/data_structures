@@ -4,6 +4,7 @@ from structures.binary_heap import MinHeap
 
 
 class BinaryHeapTestCase(unittest.TestCase):
+
     def test_swap(self):
         heap = MinHeap([1, 2, 3, 4])
         heap.swap(0, 1)

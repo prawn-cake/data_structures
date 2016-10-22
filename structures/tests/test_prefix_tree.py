@@ -5,6 +5,7 @@ from structures.prefix_tree import TrieNode, PrefixTree
 
 
 class TrieNodeTest(unittest.TestCase):
+
     def test_insert(self):
         trie = TrieNode()
         values = ['amy', 'ann', 'emma', 'rob', 'roger']
@@ -68,6 +69,7 @@ class TrieNodeTest(unittest.TestCase):
 
 
 class PrefixTreeTest(unittest.TestCase):
+
     def test_tree(self):
         prefix_tree = PrefixTree()
         values = ['amy', 'ann', 'anne', 'emma', 'rob', 'roger', 'anna']

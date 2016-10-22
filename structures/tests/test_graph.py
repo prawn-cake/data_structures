@@ -4,6 +4,7 @@ from structures.graph import Graph, dijkstra_search
 
 
 class BasicGraphTest(unittest.TestCase):
+
     def test_create_directed_graph(self):
         # NOTE: graph is directed by default
         g = Graph()
@@ -48,6 +49,7 @@ class BasicGraphTest(unittest.TestCase):
 
 
 class DijkstraSearchTest(unittest.TestCase):
+
     def test_search(self):
         struct = {'S': [('A', 7), ('B', 3)],
                   'A': [('B', 2), ('C', 2)],

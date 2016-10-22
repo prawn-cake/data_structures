@@ -66,6 +66,7 @@ class BinaryHeap(object):
 
 
 class MinHeap(BinaryHeap):
+
     def insert(self, k):
         """Insert new element into the heap
 

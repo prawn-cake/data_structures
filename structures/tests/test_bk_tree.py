@@ -4,6 +4,7 @@ from structures.bk_tree import BKTree, levenshtein_distance
 
 
 class BKTreeTestCase(unittest.TestCase):
+
     def test_base(self):
         values = ['hat', 'hate', 'trac', 'roar', 'power', 'row']
         tree = BKTree.create(values)
@@ -22,6 +23,7 @@ class BKTreeTestCase(unittest.TestCase):
 
 
 class LevenshteinDistanceTestCase(unittest.TestCase):
+
     def test_on_empty_strings(self):
         self.assertEqual(levenshtein_distance('', ''), 0)
         self.assertEqual(levenshtein_distance('a', ''), 1)
