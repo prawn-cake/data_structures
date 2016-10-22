@@ -15,8 +15,8 @@ class BKTreeTestCase(unittest.TestCase):
         nodes = tree.search('row', distance=1)
         self.assertIsInstance(nodes, list)
         for node in nodes:
-            self.assertIsInstance(node, BKTree)
-        self.assertEqual(nodes[0].word, 'row')
+            self.assertIsInstance(node, str)
+        self.assertEqual(nodes[0], 'row')
 
         result = tree.search('row', distance=2, result_set=[])
         self.assertEqual(len(result), 2)  # roar and row

@@ -41,58 +41,63 @@ class BKTree(object):
     A metric tree suggested by Walter Austin Burkhard and Robert M. Keller
     """
 
-    def __init__(self, word, distance=0):
+    def __init__(self, value, distance=0, key_function=None):
         self.nodes = {}
-        self.word = str(word)
+
+        if key_function is None:
+            key_function = lambda val: val
+
+        self.key = key_function(value)
+        self.value = value
+
         self.distance = distance  # levenshtein distance
         self.count = 1
+        self.key_function = key_function
 
-    @classmethod
-    def insert(cls, node, word):
+    def insert(self, value):
         # calculate new distance for every child node
 
-        if node is None:
-            return BKTree(word)
+        insert_key = self.key_function(value)
 
-        distance = levenshtein_distance(node.word, word)
-        if distance in node.nodes:
-            BKTree.insert(node.nodes[distance], word)
+        distance = levenshtein_distance(self.key, insert_key)
+        if distance in self.nodes:
+            self.nodes[distance].insert(value)
         else:
-            node.nodes[distance] = BKTree(word, distance=distance)
-
+            self.nodes[distance] = BKTree(value,
+                                          distance=distance,
+                                          key_function=self.key_function)
         # FIXME
-        node.count = 1 + cls.size_of(node) \
-            + sum([cls.size_of(n) for n in node.nodes.values()])
-        return node
+        self.count = 1 + self.size_of(self) \
+            + sum([self.size_of(n) for n in self.nodes.values()])
 
-    def search(self, word, distance=0, result_set=None):
+    def search(self, key, distance=0, result_set=None):
         if result_set is None:
             result_set = []
 
-        cur_distance = levenshtein_distance(word, self.word)
+        cur_distance = levenshtein_distance(key, self.key)
 
         if cur_distance <= distance:
             result_set.append(self)
 
         for d, node in self.nodes.items():
             if cur_distance - distance <= d <= cur_distance + distance:
-                node.search(word, distance, result_set)
+                node.search(key, distance, result_set)
 
-        return result_set
+        return [node.value for node in result_set]
 
     @property
     def max_val(self):
         last_node = self
         while last_node.right:
             last_node = last_node.right
-        return last_node.word
+        return last_node.value
 
     @property
     def min_val(self):
         last_node = self
         while last_node.left:
             last_node = last_node.left
-        return last_node.word
+        return last_node.value
 
     @classmethod
     def get_min(cls, node):
@@ -107,22 +112,10 @@ class BKTree(object):
 
         if node.left:
             BKTree.in_order_traversal(node.left, order)
-        order.append(node.word)
+        order.append(node.value)
         if node.right:
             BKTree.in_order_traversal(node.right, order)
         return order
-
-    @classmethod
-    def get_tree(cls, values):
-        """Build tree from list of values
-
-        :param values:
-        :return:
-        """
-        root = BKTree.insert(None, values[0])
-        for value in values[1:]:
-            BKTree.insert(root, value)
-        return root
 
     @classmethod
     def size_of(cls, node):
@@ -134,24 +127,14 @@ class BKTree(object):
             return 0
         return 1 + max(cls.height(node.left), cls.height(node.right))
 
-    def __unicode__(self):
-        return self.__repr__()
-
-    def __repr__(self):
-        return "{}(word={}; distance:{}; nodes={})".format(
-            self.__class__.__name__,
-            self.word,
-            self.distance,
-            self.count)
-
     @staticmethod
-    def create(values):
+    def create(values, key_function=None):
         """Factory method to create a tree
 
         :param values: list of values
         :return: BKTree instance
         """
-        root = BKTree(values.pop())
+        root = BKTree(value=values.pop(), key_function=key_function)
         for val in values:
-            BKTree.insert(root, val)
+            root.insert(val)
         return root
