@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from collections import deque
+import collections
 import heapq
 
 
@@ -64,7 +64,7 @@ class Vertex(object):
 def bfs(start_vertex):
     """Breadth-first search implementation"""
 
-    queue = deque()
+    queue = collections.deque()
     start_vertex.mark_as_visited()
     queue.appendleft(start_vertex)
 

@@ -1,29 +1,23 @@
 # -*- coding: utf-8 -*-
 import unittest
-from structures.bk_tree import BKNode, levenshtein_distance
+from structures.bk_tree import BKTree, levenshtein_distance
 
 
-class BKNodeTestCase(unittest.TestCase):
+class BKTreeTestCase(unittest.TestCase):
     def test_base(self):
-        root = BKNode('hat')
-        BKNode.insert(root, 'hate')
-        BKNode.insert(root, 'trac')
-        BKNode.insert(root, 'roar')
-        BKNode.insert(root, 'power')
-        BKNode.insert(root, 'row')
+        values = ['hat', 'hate', 'trac', 'roar', 'power', 'row']
+        tree = BKTree.create(values)
 
-        # print(root.in_order_traversal(root))
+        # self.assertEqual(tree.count, 6)  # FIXME
+        self.assertEqual(tree.search('grow'), [])
 
-        # self.assertEqual(root.count, 6)  # FIXME
-        self.assertEqual(root.search('grow'), [])
-
-        nodes = root.search('row', tolerance=1)
+        nodes = tree.search('row', distance=1)
         self.assertIsInstance(nodes, list)
         for node in nodes:
-            self.assertIsInstance(node, BKNode)
+            self.assertIsInstance(node, BKTree)
         self.assertEqual(nodes[0].word, 'row')
 
-        result = root.search('row', tolerance=2, result_set=[])
+        result = tree.search('row', distance=2, result_set=[])
         self.assertEqual(len(result), 2)  # roar and row
 
 

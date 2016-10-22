@@ -35,7 +35,7 @@ def levenshtein_distance(s, t):
     return current_row[n]
 
 
-class BKNode(object):
+class BKTree(object):
     """
     BK-tree implementation.
     A metric tree suggested by Walter Austin Burkhard and Robert M. Keller
@@ -52,31 +52,31 @@ class BKNode(object):
         # calculate new distance for every child node
 
         if node is None:
-            return BKNode(word)
+            return BKTree(word)
 
         distance = levenshtein_distance(node.word, word)
         if distance in node.nodes:
-            BKNode.insert(node.nodes[distance], word)
+            BKTree.insert(node.nodes[distance], word)
         else:
-            node.nodes[distance] = BKNode(word, distance=distance)
+            node.nodes[distance] = BKTree(word, distance=distance)
 
         # FIXME
         node.count = 1 + cls.size_of(node) \
                      + sum([cls.size_of(n) for n in node.nodes.values()])
         return node
 
-    def search(self, word, tolerance=0, result_set=None):
+    def search(self, word, distance=0, result_set=None):
         if result_set is None:
             result_set = []
 
-        distance = levenshtein_distance(word, self.word)
+        cur_distance = levenshtein_distance(word, self.word)
 
-        if distance <= tolerance:
+        if cur_distance <= distance:
             result_set.append(self)
 
         for d, node in self.nodes.items():
-            if distance - tolerance <= d <= distance + tolerance:
-                node.search(word, tolerance, result_set)
+            if cur_distance - distance <= d <= cur_distance + distance:
+                node.search(word, distance, result_set)
 
         return result_set
 
@@ -106,10 +106,10 @@ class BKNode(object):
             order = []
 
         if node.left:
-            BKNode.in_order_traversal(node.left, order)
+            BKTree.in_order_traversal(node.left, order)
         order.append(node.word)
         if node.right:
-            BKNode.in_order_traversal(node.right, order)
+            BKTree.in_order_traversal(node.right, order)
         return order
 
     @classmethod
@@ -119,9 +119,9 @@ class BKNode(object):
         :param values:
         :return:
         """
-        root = BKNode.insert(None, values[0])
+        root = BKTree.insert(None, values[0])
         for value in values[1:]:
-            BKNode.insert(root, value)
+            BKTree.insert(root, value)
         return root
 
     @classmethod
@@ -143,3 +143,15 @@ class BKNode(object):
             self.word,
             self.distance,
             self.count)
+
+    @staticmethod
+    def create(values):
+        """Factory method to create a tree
+
+        :param values: list of values
+        :return: BKTree instance
+        """
+        root = BKTree(values.pop())
+        for val in values:
+            BKTree.insert(root, val)
+        return root
