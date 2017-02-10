@@ -27,7 +27,8 @@ class BinarySearchTreeTest(unittest.TestCase):
         Node.insert(root, 6)
         Node.insert(root, 3)
 
-        self.assertEqual(Node.in_order_traversal(root), [1, 2, 3, 4, 5, 6, 7])
+        order = Node.in_order_traversal(root)
+        self.assertEqual([node.value for node in order], [1, 2, 3, 4, 5, 6, 7])
         self.do_basic_checks(root=root)
 
         # Build tree from the list

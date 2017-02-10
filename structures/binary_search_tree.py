@@ -65,54 +65,59 @@ class Node(object):
         return node
 
     @classmethod
-    def in_order_traversal(cls, node, order=None):
-        if order is None:
-            order = []
+    def in_order_traversal(cls, node):
+        order = []
+        stack = []
 
-        if node.left:
-            Node.in_order_traversal(node.left, order)
-        order.append(node.value)
-        if node.right:
-            Node.in_order_traversal(node.right, order)
+        current_node = node
+        while stack or current_node is not None:
+            # go down till the last left child
+            if current_node is not None:
+                stack.append(current_node)
+                current_node = current_node.left
+            else:
+                # once we reach last left child start to visit closest right
+                # child
+                current_node = stack.pop()
+                order.append(current_node)
+                current_node = current_node.right
         return order
 
     @classmethod
-    def pre_order_traversal(cls, node, order=None):
-        if order is None:
-            order = []
+    def pre_order_traversal(cls, node):
+        order = []
+        stack = [node]
+        while stack:
+            current_node = stack.pop()
+            order.append(current_node.value)
+            if current_node.right:
+                stack.append(current_node.right)
 
-        order.append(node.value)
-        if node.left:
-            Node.pre_order_traversal(node.left, order)
-        if node.right:
-            Node.pre_order_traversal(node.right, order)
+            # Put left always on top of stack
+            if current_node.left:
+                stack.append(current_node.left)
 
         return order
 
     @classmethod
-    def level_order_traversal(cls, node, queue=None, order=None):
+    def level_order_traversal(cls, node):
         """Level order traversal is implemented with queue
         Steps:
             1. Add node value to order list and go ahead
             2. Put next node to the queue (left AND/OR right if exists)
-            3. Declare while loop and repeat first two steps until queue length
-            will be equal 0
-
+            3. Declare while loop and repeat first two steps until the length
+            is 0
         """
-        if order is None:
-            order = []
-        if queue is None:
-            queue = deque()
-
-        order.append(node.value)
-        if node.left:
-            queue.append(node.left)
-        if node.right:
-            queue.append(node.right)
+        order = []
+        queue = deque([node])
 
         while len(queue) != 0:
-            Node.level_order_traversal(
-                queue.popleft(), queue=queue, order=order)
+            current_node = queue.pop()
+            order.append(current_node.value)
+            if current_node.left:
+                queue.appendleft(current_node.left)
+            if current_node.right:
+                queue.appendleft(current_node.right)
 
         return order
 
@@ -142,7 +147,7 @@ class Node(object):
 
     @classmethod
     def rank(cls, value, node):
-        """How many values less than value
+        """How many values less than value X
 
         :param value:
         :param node:
@@ -188,12 +193,6 @@ class Node(object):
         node.left = Node.delete_min(node.left)
         node.count = 1 + cls.size_of(node.left) + cls.size_of(node.right)
         return node
-
-    def __unicode__(self):
-        return "{}(value={}; nodes={})".format(
-            self.__class__.__name__,
-            self.value,
-            self.count)
 
     def __repr__(self):
         return "{}(value={}; nodes={})".format(
