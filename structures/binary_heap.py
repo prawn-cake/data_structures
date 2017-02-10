@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
-import abc
 
 
 class BinaryHeap(object):
-
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, values=None):
         self._storage = values or []
@@ -13,9 +10,8 @@ class BinaryHeap(object):
     def storage(self):
         return self._storage
 
-    @abc.abstractmethod
     def insert(self, k):
-        pass
+        raise NotImplementedError()
 
     @classmethod
     def heapify(cls, values):
@@ -24,13 +20,11 @@ class BinaryHeap(object):
             heap.insert(k)
         return heap
 
-    @abc.abstractmethod
     def remove(self, k):
-        pass
+        raise NotImplementedError()
 
-    @abc.abstractmethod
     def extract_min(self):
-        pass
+        raise NotImplementedError()
 
     def swap(self, i, j):
         swap = self.storage[i]

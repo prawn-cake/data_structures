@@ -17,7 +17,7 @@ I recommend try to find mature implementations, but in case you need to customiz
 my implementation is a good start to customize it for your needs.
 
 
-## Data structure implementations
+## Data structures implemented
 
 * Binary search tree
 * Binary heap
@@ -26,10 +26,16 @@ my implementation is a good start to customize it for your needs.
     * dijkstra search
     * bfs
 * [BK-Tree](https://en.wikipedia.org/wiki/BK-tree)
-* [Prefix tree] (https://en.wikipedia.org/wiki/Trie)
+* [Prefix tree](https://en.wikipedia.org/wiki/Trie)
 
+## Links
+
+* [List of algorithms](https://en.wikipedia.org/wiki/List_of_algorithms)
+* [List of data structures](https://en.wikipedia.org/wiki/List_of_data_structures)
+* [Google Technical Development Guide](https://www.google.com/about/careers/students/guide-to-technical-development.html)
 
 ## Tests
-`tox`
+
+    tox
  
  
