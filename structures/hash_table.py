@@ -54,11 +54,12 @@ NULL = object()
 class AssociativeArray(object):
     def __init__(self):
         self._size = 0
+        self.m = 97
 
     def put(self, key, value):
         raise NotImplementedError()
 
-    def get(self, key):
+    def get(self, value):
         raise NotImplementedError()
 
     def delete(self, key):
@@ -79,6 +80,9 @@ class AssociativeArray(object):
 
     def keys(self):
         raise NotImplementedError()
+
+    def hash(self, key):
+        return (hash(key) & 0x7fffffff) % self.m
 
 
 class Node(object):
@@ -107,9 +111,6 @@ class SeparateChainHashTable(AssociativeArray):
         super().__init__()
         self.m = 97  # number of chains
         self.chains = [[] for _ in range(self.m)]  # array of chains
-
-    def hash(self, key):
-        return (hash(key) & 0x7fffffff) % self.m
 
     def get(self, key):
         i = self.hash(key)
@@ -160,8 +161,8 @@ class LinearProbingHashTable(AssociativeArray):
     def __init__(self):
         super().__init__()
         self.m = 97
-        self._keys = []
-        self._values = []
+        self._keys = [NULL] * self.m
+        self._values = [None] * self.m
 
     def delete(self, key):
         """Find and remove key-value pair and then reinsert all of the
@@ -174,4 +175,51 @@ class LinearProbingHashTable(AssociativeArray):
 
         :param key:
         """
-        pass
+        i = self.hash(key)
+        while self._keys[i] != key and self._keys[i] is not NULL:
+            i += 1
+
+        if self._keys[i] is NULL:
+            return False
+
+        self._keys[i] = NULL
+        self._values[i] = None
+        self._size -= 1
+
+        # if self.size / self.m <= 0.125:
+        #     self._rehash(int(self.m / 2))
+
+        return True
+
+    def _rehash(self, new_m):
+        new_keys = [NULL] * new_m
+        new_values = [None] * new_m
+        for key, value in zip(self._keys, self._values):
+            if key is NULL:
+                continue
+            i = self.hash(key)
+            new_keys[i] = key
+            new_values[i] = value
+
+        self.m = new_m
+        self._keys = new_keys
+        self._values = new_values
+
+    def put(self, key, value):
+        i = self.hash(key)
+
+        while self._keys[i] is not NULL:
+            i += 1
+
+        self._keys[i] = key
+        self._values[i] = value
+        self._size += 1
+        if self.size / self.m >= 0.5:
+            self._rehash(2 * self.m)
+
+    def get(self, key):
+        i = self.hash(key)
+
+        while self._keys[i] != key and self._keys[i] is not NULL:
+            i += 1
+        return self._values[i]
