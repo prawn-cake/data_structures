@@ -11,9 +11,6 @@ def binary_search(arr, key):
     lo, hi = 0, n - 1  # lower and higher search bounds
 
     while lo <= hi:
-        # [lo, .., hi]  --> [.., lo, .., hi, ..] and to get mid index you need
-        # to add lo value to (hi - lo)
-        # mid = (hi - lo) + lo // 2
         mid = get_mid(lo, hi)
         if key > arr[mid]:
             lo = mid + 1
